@@ -1,10 +1,8 @@
-import * as React from "react";
 import Card from "@mui/material/Card";
 import Typography from "@mui/material/Typography";
 import { useQuery } from "@tanstack/react-query";
 import Skeleton from "@mui/material/Skeleton";
 import Box from "@mui/material/Box";
-import Link from "@mui/material/Link";
 
 type User = {
   id: string;
@@ -30,35 +28,7 @@ type User = {
   };
 };
 
-type PropsMessage = {
-  type: string;
-  payload: Record<string, string>;
-};
-
 function App() {
-  const [title, setTitle] = React.useState("");
-
-  React.useEffect(() => {
-    const handler = (event: MessageEvent<unknown>) => {
-      if (event.origin === "http://localhost:3000" && event.data) {
-        try {
-          const message = event.data as PropsMessage;
-          if (message.type === "setProps") {
-            setTitle(message.payload.title);
-          }
-        } catch (err) {
-          console.log(err);
-        }
-      }
-    };
-
-    window.addEventListener("message", handler);
-
-    return () => {
-      window.removeEventListener("message", handler);
-    };
-  }, []);
-
   const query = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
@@ -81,14 +51,6 @@ function App() {
         overflowY: "scroll",
       }}
     >
-      <Typography variant="h6" sx={{ fontSize: { "@sm": "2rem" } }}>
-        {title}
-      </Typography>
-
-      <Typography sx={{ display: { "@": "block", "@sm": "none" } }}>
-        This only appears if the container is small
-      </Typography>
-
       {query.isPending && (
         <Box
           component="ul"
@@ -121,17 +83,7 @@ function App() {
         >
           {query.data.map((user) => (
             <Typography variant="body1" component="li" key={user.id}>
-              <Link
-                component="button"
-                onClick={() => {
-                  window.parent.postMessage(
-                    { type: "click", payload: user },
-                    "*"
-                  );
-                }}
-              >
-                {user.name}
-              </Link>
+              {user.name}
             </Typography>
           ))}
         </Box>
